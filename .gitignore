@@ -1,0 +1,5 @@
+isodir
+*.d
+*.o
+*.kernel
+*.iso
