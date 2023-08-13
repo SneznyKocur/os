@@ -1,10 +1,9 @@
 #include "../boot/multiboot2.h"
-
+#include "../libc/stdio.h"
 
 void kernel_main(unsigned long magic, unsigned long addr) {
     struct multiboot_tag *tag;
     struct multiboot_tag_framebuffer *tagfb;
-    unsigned long *fb;
 
     // taken from https://www.gnu.org/software/grub/manual/multiboot2/multiboot.html#Example-OS-code
 
@@ -29,7 +28,7 @@ void kernel_main(unsigned long magic, unsigned long addr) {
             {
             tagfb = (struct multiboot_tag_framebuffer *) tag;
             
-            *fb = (unsigned long) tagfb->common.framebuffer_addr;
+            
             break;
             }
 
@@ -38,12 +37,12 @@ void kernel_main(unsigned long magic, unsigned long addr) {
 
     multiboot_uint32_t color = 0x00ffffffff;
     unsigned x,y;
-    for (x = 0; x < tagfb->common.framebuffer_width; x++) {
-        for (y = 0; y < tagfb->common.framebuffer_height*4; y++) {
-            multiboot_uint32_t *pixel = *fb + x + y * tagfb->common.framebuffer_pitch/4;
-            *pixel = color;
-        }
-    }
+    x = y = 00;
+    unsigned long *fb = (unsigned long) tagfb->common.framebuffer_addr;
+    putpixel(fb,tagfb->common.framebuffer_pitch,200,200,color);
+    write_string(fb,tagfb->common.framebuffer_pitch,"Hello, World!",color,0);
+    
+    
   
 }
 
