@@ -1,4 +1,5 @@
 #include "string.h"
+#include "stdio.h"
 unsigned char *font[] = {
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x7E, 0x81, 0xA5, 0x81, 0x81, 0xBD, 0x99, 0x81, 0x81, 0x7E, 0x00, 0x00,
@@ -275,7 +276,15 @@ unsigned char *font[] = {
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00,
 };
-static void
+unsigned long *global_fb;
+unsigned int global_pitch;
+
+unsigned int global_fgcolor;
+unsigned int global_bgcolor;
+
+unsigned int last_x;
+unsigned int last_y;
+void
 itoa (char *buf, int base, int d)
 {
   char *p = buf;
@@ -317,9 +326,18 @@ itoa (char *buf, int base, int d)
       p2--;
     }
 }
-void putpixel(unsigned long *fb,unsigned int pitch, unsigned x, unsigned y, unsigned int color) {
-    unsigned int *pixel = fb + x + y * pitch/4;
+void putpixel(unsigned x, unsigned y, unsigned int color) {
+    unsigned int *pixel = global_fb + x + y * global_pitch/4;
     *pixel = color;
+}
+
+void video_init(unsigned long *fb, unsigned int pitch) {
+    global_fb = fb;
+    global_pitch = pitch;
+}
+void set_color(unsigned int fgcolor, unsigned int bgcolor) {
+    global_fgcolor = fgcolor;
+    global_bgcolor = bgcolor;
 }
 unsigned int reverseBits(unsigned int num)
 {
@@ -332,7 +350,7 @@ unsigned int reverseBits(unsigned int num)
     }
     return reverse_num;
 }
-void putchar(unsigned long *fb, unsigned int pitch, unsigned x, unsigned y, unsigned char c, unsigned int fgcolor, unsigned int bgcolor) {
+void putchar( unsigned x, unsigned y, unsigned char c) {
     int cx,cy;
 	int mask[8]={1,2,4,8,16,32,64,128};
  
@@ -340,14 +358,84 @@ void putchar(unsigned long *fb, unsigned int pitch, unsigned x, unsigned y, unsi
         char next = reverseBits(font[(int)c*16 + cy]); // this return 0x18 for 0x6 view table above
 		for(cx=0;cx<8;cx++){
             
-			putpixel(fb,pitch,x+cx,y+cy,next&mask[cx]?fgcolor:bgcolor); // bit twiddling
+			putpixel(x+cx,y+cy,next&mask[cx]?global_fgcolor:global_bgcolor); // bit twiddling
 		}
 	}
+    last_x = x+cx;
+    last_y = y;
+    if (c == "\n") {
+      last_y += 16; // 16 is height of one character
+    }
 }
-void write_string(unsigned long *fb, unsigned int pitch, unsigned char* message, unsigned int fgcolor, unsigned int bgcolor) {
-    unsigned x,y;
+void putchar_nopos(unsigned char c) {
+
+    putchar(last_x,last_y,c);
+}
+void write_string(unsigned int x, unsigned int y, unsigned char* message) {
     for (int i = 0; i < strlen(message); i++){
-        putchar(fb,pitch,x,y,message[i],fgcolor,bgcolor);
+        putchar(x,y,message[i]);
         x+=8;
+        if (strcmp(message[i], "\n")) {
+          y+=16;
+        }
+    }
+}
+void printf (const char *format, ...) {
+  char **arg = (char **) &format;
+  int c;
+  char buf[20];
+
+  arg++;
+  
+  while ((c = *format++) != 0)
+    {
+      if (c != '%')
+        putchar_nopos (c);
+      else
+        {
+          char *p, *p2;
+          int pad0 = 0, pad = 0;
+          
+          c = *format++;
+          if (c == '0')
+            {
+              pad0 = 1;
+              c = *format++;
+            }
+
+          if (c >= '0' && c <= '9')
+            {
+              pad = c - '0';
+              c = *format++;
+            }
+
+          switch (c)
+            {
+            case 'd':
+            case 'u':
+            case 'x':
+              itoa (buf, c, *((int *) arg++));
+              p = buf;
+              goto string;
+              break;
+
+            case 's':
+              p = *arg++;
+              if (! p)
+                p = "(null)";
+
+            string:
+              for (p2 = p; *p2; p2++);
+              for (; p2 < p + pad; p2++)
+                putchar_nopos (pad0 ? '0' : ' ');
+              while (*p)
+                putchar_nopos (*p++);
+              break;
+
+            default:
+              putchar_nopos (*((int *) arg++));
+              break;
+            }
+        }
     }
 }

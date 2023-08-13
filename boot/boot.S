@@ -17,7 +17,7 @@
 
 #define ASM_FILE        1
 #include "multiboot2.h"
-
+#
 /*  C symbol format. HAVE_ASM_USCORE is defined by configure. */
 #ifdef HAVE_ASM_USCORE
 # define EXT_C(sym)                     _ ## sym
@@ -82,8 +82,8 @@ framebuffer_tag_start:
         .short MULTIBOOT_HEADER_TAG_FRAMEBUFFER
 
         .long framebuffer_tag_end - framebuffer_tag_start
-        .long 1920
-        .long 1080
+        .long 1280
+        .long 720
         .long 32
 framebuffer_tag_end:
         .short MULTIBOOT_HEADER_TAG_END

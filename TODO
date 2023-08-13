@@ -1,0 +1,2 @@
+load gdt in boot.S
+finish idt (https://youtu.be/NqSE_aVCJXg?t=1779)
