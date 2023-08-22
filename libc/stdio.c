@@ -368,8 +368,15 @@ void putchar( unsigned x, unsigned y, unsigned char c) {
     }
 }
 void putchar_nopos(unsigned char c) {
-
-    putchar(last_x,last_y,c);
+  if (c == "\n") {
+    last_y +=16;
+    return;
+  }
+  if (c == "\r") {
+    last_x = 0;
+    return;
+  }
+  putchar(last_x,last_y,c);
 }
 void write_string(unsigned int x, unsigned int y, unsigned char* message) {
     for (int i = 0; i < strlen(message); i++){

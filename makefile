@@ -23,8 +23,8 @@ iso: kernel
 	cp kernel.kernel isodir/boot/os
 	cp grub.cfg isodir/boot/grub/grub.cfg
 	grub-mkrescue -o myos.iso isodir
-kernel: ${OBJFILES} linker.ld boot/boot.o kernel/kernel.o drivers/cpu/interrupt.o
-	$(CC) ${CFLAGS} -T linker.ld -o kernel.kernel boot/boot.o ${OBJFILES} drivers/cpu/interrupt.o
+kernel: ${OBJFILES} linker.ld boot/boot.o kernel/kernel.o 
+	$(CC) ${CFLAGS} -T linker.ld -o kernel.kernel boot/boot.o ${OBJFILES}
 	grub-file --is-x86-multiboot2 kernel.kernel
 clean:
 	rm -rf isodir

@@ -1,7 +1,7 @@
 #include "../boot/multiboot2.h"
 #include "../libc/stdio.h"
 #include "../drivers/keyboard.h"
-#include "../drivers/cpu/idt.h"
+//include "../drivers/cpu/idt.h"
 void kernel_main(unsigned long magic, unsigned long addr) {
     struct multiboot_tag *tag;
     struct multiboot_tag_framebuffer *tagfb;
@@ -37,15 +37,15 @@ void kernel_main(unsigned long magic, unsigned long addr) {
     }
     //isr_install();
     //irq_install();
-    idt_init();
+    //idt_init();
     multiboot_uint32_t color = 0x00ffffffff;
     unsigned x,y;
     x = y = 00;
     unsigned long *fb = (unsigned long) tagfb->common.framebuffer_addr;
     video_init(fb,tagfb->common.framebuffer_pitch);
     set_color(color,0);
-    printf("testing 123");
     init_keyboard();
+    printf("%dx%d @%dbpp\r\n",tagfb->common.framebuffer_width,tagfb->common.framebuffer_height,tagfb->common.framebuffer_bpp);
     
   
 }

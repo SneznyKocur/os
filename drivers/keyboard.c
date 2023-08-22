@@ -22,7 +22,7 @@ const char sc_ascii[] = { '?', '?', '1', '2', '3', '4', '5', '6',
         'H', 'J', 'K', 'L', ';', '\'', '`', '?', '\\', 'Z', 'X', 'C', 'V', 
         'B', 'N', 'M', ',', '.', '/', '?', '?', '?', ' '};
 
-static void keyboard_callback(registers_t *regs) {
+static void keyboard_callback() {
     /* The PIC leaves us the scancode in port 0x60 */
     uint8_t scancode = port_byte_in(0x60);
     
@@ -32,9 +32,8 @@ static void keyboard_callback(registers_t *regs) {
     char str[2] = {letter, '\0'};
     append(key_buffer, letter);
     kprint(str);
-    (void)(regs);
 }
 
 void init_keyboard() {
-   register_interrupt_handler(IRQ1, keyboard_callback); 
+  //register_interrupt_handler(IRQ1, keyboard_callback); 
 }
