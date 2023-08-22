@@ -8,7 +8,7 @@ WARNINGS := -Wall -Wextra -pedantic -Wshadow -Wpointer-arith -Wcast-align \
             -Wwrite-strings -Wmissing-prototypes -Wmissing-declarations \
             -Wredundant-decls -Wnested-externs -Winline -Wno-long-long \
             -Wconversion -Wstrict-prototypes -Wno-int-conversion
-CFLAGS := -g -nostdlib -nostdinc -std=gnu99 -ffreestanding $(WARNINGS)
+CFLAGS := -mgeneral-regs-only -mno-red-zone -g -nostdlib -nostdinc -std=gnu99 -ffreestanding $(WARNINGS)
 CC :=  /usr/local/i386elfgcc/bin/i386-elf-gcc
 all: run
 run: iso
@@ -23,8 +23,8 @@ iso: kernel
 	cp kernel.kernel isodir/boot/os
 	cp grub.cfg isodir/boot/grub/grub.cfg
 	grub-mkrescue -o myos.iso isodir
-kernel: ${OBJFILES} linker.ld boot/boot.o kernel/kernel.o drivers/cpu/interrupt.o
-	$(CC) ${CFLAGS} -T linker.ld -o kernel.kernel boot/boot.o ${OBJFILES} drivers/cpu/interrupt.o
+kernel: ${OBJFILES} linker.ld boot/boot.o kernel/kernel.o drivers/cpu/interrupts/interrupt.o
+	$(CC) ${CFLAGS} -T linker.ld -o kernel.kernel boot/boot.o ${OBJFILES} drivers/cpu/interrupts/interrupt.o
 	grub-file --is-x86-multiboot2 kernel.kernel
 clean:
 	rm -rf isodir
@@ -38,5 +38,5 @@ clean:
 
 .S.o:
 	$(CC) -MD -c $< -o $@ $(CFLAGS)
-drivers/cpu/interrupt.o: drivers/cpu/interrupt.asm
+drivers/cpu/interrupts/interrupt.o: drivers/cpu/interrupts/interrupt.S
 	nasm $< -f elf -o $@

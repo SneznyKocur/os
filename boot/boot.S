@@ -17,6 +17,7 @@
 
 #define ASM_FILE        1
 #include "multiboot2.h"
+#include "gdt.S"
 #
 /*  C symbol format. HAVE_ASM_USCORE is defined by configure. */
 #ifdef HAVE_ASM_USCORE
@@ -96,6 +97,9 @@ multiboot_entry:
         /*  Reset EFLAGS. */
         pushl   $0
         popf
+
+        /* load gdt */
+        lgdt    gdt_descriptor
 
         /*  Push the pointer to the Multiboot information structure. */
         pushl   %ebx

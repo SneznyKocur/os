@@ -1,2 +1,12 @@
-load gdt in boot.S
+load gdt in boot.S   DONE
 finish idt (https://youtu.be/NqSE_aVCJXg?t=1779)
+keyboard
+fix printf for new lines
+file system (fat32)
+shell
+        posix?
+sound?
+binary format? (elf / exe or somethign custom)
+        internet?
+        package manager?
+        bad apple?
