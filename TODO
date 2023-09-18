@@ -1,7 +1,12 @@
-load gdt in boot.S                                      DONE
-finish idt (https://youtu.be/NqSE_aVCJXg?t=1779)        DONE (??)
-handle all interrupts in kernel
+load gdt in boot.S   DONE
+finish idt (https://youtu.be/NqSE_aVCJXg?t=1779)
 keyboard
+fix printf for new lines
+file system (fat32)
 shell
-sound (sb16)
-bad apple / we live, we love, we lie
+        posix?
+sound?
+binary format? (elf / exe or somethign custom)
+        internet?
+        package manager?
+        bad apple?
